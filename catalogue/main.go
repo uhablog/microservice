@@ -11,6 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Book struct {
@@ -25,7 +26,7 @@ var (
 		Id:     1,
 		Title:  "The Awakening",
 		Author: "Kate Chopin",
-		Price:  1000,
+		Price:  3000,
 	}
 	book2 = Book{
 		Id:     2,
@@ -55,6 +56,22 @@ func (s *server) GetBook(ctx context.Context, in *pb.GetBookRequest) (*pb.GetBoo
 	}
 
 	return &pb.GetBookResponse{Book: protoBook}, nil
+}
+
+func (s *server) ListBooks(ctx context.Context, in *emptypb.Empty) (*pb.ListBooksResponse, error) {
+	protoBooks := make([]*pb.Book, 0)
+
+	for _, book := range books {
+		protoBook := &pb.Book{
+			Id:     int32(book.Id),
+			Title:  book.Title,
+			Author: book.Author,
+			Price:  int32(book.Price),
+		}
+		protoBooks = append(protoBooks, protoBook)
+	}
+
+	return &pb.ListBooksResponse{Books: protoBooks}, nil
 }
 
 var (

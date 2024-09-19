@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -19,7 +20,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Catalogue_GetBook_FullMethodName = "/book.Catalogue/GetBook"
+	Catalogue_GetBook_FullMethodName   = "/book.Catalogue/GetBook"
+	Catalogue_ListBooks_FullMethodName = "/book.Catalogue/ListBooks"
 )
 
 // CatalogueClient is the client API for Catalogue service.
@@ -29,6 +31,7 @@ const (
 // `GetBookRequest`を受け取り、`GetBookResponse`を返す`Catalogue`サービスの定義
 type CatalogueClient interface {
 	GetBook(ctx context.Context, in *GetBookRequest, opts ...grpc.CallOption) (*GetBookResponse, error)
+	ListBooks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListBooksResponse, error)
 }
 
 type catalogueClient struct {
@@ -49,6 +52,16 @@ func (c *catalogueClient) GetBook(ctx context.Context, in *GetBookRequest, opts 
 	return out, nil
 }
 
+func (c *catalogueClient) ListBooks(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListBooksResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListBooksResponse)
+	err := c.cc.Invoke(ctx, Catalogue_ListBooks_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CatalogueServer is the server API for Catalogue service.
 // All implementations must embed UnimplementedCatalogueServer
 // for forward compatibility.
@@ -56,6 +69,7 @@ func (c *catalogueClient) GetBook(ctx context.Context, in *GetBookRequest, opts 
 // `GetBookRequest`を受け取り、`GetBookResponse`を返す`Catalogue`サービスの定義
 type CatalogueServer interface {
 	GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error)
+	ListBooks(context.Context, *emptypb.Empty) (*ListBooksResponse, error)
 	mustEmbedUnimplementedCatalogueServer()
 }
 
@@ -68,6 +82,9 @@ type UnimplementedCatalogueServer struct{}
 
 func (UnimplementedCatalogueServer) GetBook(context.Context, *GetBookRequest) (*GetBookResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBook not implemented")
+}
+func (UnimplementedCatalogueServer) ListBooks(context.Context, *emptypb.Empty) (*ListBooksResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListBooks not implemented")
 }
 func (UnimplementedCatalogueServer) mustEmbedUnimplementedCatalogueServer() {}
 func (UnimplementedCatalogueServer) testEmbeddedByValue()                   {}
@@ -108,6 +125,24 @@ func _Catalogue_GetBook_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Catalogue_ListBooks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CatalogueServer).ListBooks(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Catalogue_ListBooks_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CatalogueServer).ListBooks(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Catalogue_ServiceDesc is the grpc.ServiceDesc for Catalogue service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -118,6 +153,10 @@ var Catalogue_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetBook",
 			Handler:    _Catalogue_GetBook_Handler,
+		},
+		{
+			MethodName: "ListBooks",
+			Handler:    _Catalogue_ListBooks_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
