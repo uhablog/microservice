@@ -35,4 +35,4 @@ app.use(
 );
 
 app.listen(4000);
-console.log(`Server redy at http://localhost:4000/graphql`);
+console.log(`Server redy at http://localhost:4000/`);
